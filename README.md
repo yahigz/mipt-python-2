@@ -10,56 +10,66 @@
 ## Архитектура:
     - Используются библиотеки telebot, random, aiogram.types
 
-    - Файл data.py содержит код для поддержания работы с данными пользователей
+    - В файле emphasis.txt хранятся упражнения для ударений в формате абоба Абоба абОба абобА, где Абоба - правильный вариант ответа
+    - В файле prepri.txt хранятся упражнения для пре/при в формате пр_абоба Е, преабоба - правильный вариант ответа
+    - В файле suffix.txt хранятся упражнения для суффиксов в формате абоб_к И, абобик - правильный вариант ответа
+    - В файле prefix.txt хранятся упражнения для приставок в формате д_абоба О, доабоба - правильный вариант ответа
+    - В файле users.txt хранится информация о пользователях - их id, имя и счёт.
 
-        - int CORRECT_ANSWER_INCREMENT, int INCORRECT_ANSWER_DECREMENT - как изменяется счет при правильном ответе
-
-        - В файле users.txt хранится информация о пользователях - их id, имя и счёт.
+    - Файл data.py содержит код для поддержания работы с данными пользователей и тренировок
 
         - Класс User: - пользователь
             - int id - id пользователя
             - str name - имя пользователя
             - int score - счет пользователя
+            - int CORRECT_ANSWER_INCREMENT, int INCORRECT_ANSWER_DECREMENT - как изменяется счет при правильном ответе
 
             - __init__() - создать пользователя. По умолчанию имя каждого пользователя - "Abobus#____", где вместо ____ выбирается  случайное четырехзначное число
             - def correct_answer() - увеличить счет пользователя на CORRECT_ANSWER_INCREMENT
             - def incorrect_answer() - уменьшить счет пользователя на INCORRECT_ANSWER_DECREMENT
+            - def write() - записать пользователя в users.txt
+            - def reset() - сбросить счет пользователя
+            - def rename(str name) - переименовать пользователя
 
         - Класс UserDatabase: - здесь хранится информация о пользователях 
             - dict users - по id пользователя можно получить информацию о нём
-            - list top_users
+            - User top_user
+            - dict wait_list - список пользователей с необработанными запросами
+            - dict type - какой статус у пользователя. 0 - ударение, 1 - пре/при, 3 - смена имени, 2 - префикс, 4 - суффикс
 
             - __init__() - загружаются данные из users.txt
             - def sync_file() - синхронизировать users.txt с текущей информацией о пользователях
             - def update_top() - обновить топ
-            - def add_user(User) - добавить пользователя в базу
-        
-    - Файл app.py содержит код для поддержания логики работы бота
+            - def add_user(int user_id) - добавить пользователя в базу
+            - def exists(int user_id) - присутствует ли пользователь в базе
+            - def get_score(int user_id) - узнать счет пользователя
+            - def reset(int user_id) - сбросить счет пользователя
+            - def answered(int user_id, bool status) - обработать ответ пользователя
 
-        - UserDatabase users
-
-        - В файле emphasis.txt хранятся упражнения для ударений в формате абоба Абоба абОба абобА, где Абоба - правильный вариант ответа
-        - В файле prepri.txt хранятся упражнения для пре/при в формате пр_абоба Е, преабоба - правильный вариант ответа
-        - В файле suffix.txt хранятся упражнения для суффиксов в формате абоб_к И, абобик - правильный вариант ответа
-        - В файле prefix.txt хранятся упражнения для приставок в формате д_абоба О, доабоба - правильный вариант ответа
-
-        class Exercise:
+        - Класс Exercise:
             - str question - вопрос, который выведется 
             - str answer - ожидаемый ответ
             - list variants - варианты ответа 
 
-            - __init__(int type) - type - тип упражнения - type = 0 - ударения, type = 1 - пре/при, type = 2 - остальное. type определяет, что будет в variants
+            - __init__(str question, str answer, list variants)
 
-        - def extract_exercises(str path) - выгружает содержимое файла в список упражнений
-        - def extract_exercises_emphasis(str path) - выгружает содержимое файла в список упражнений для ударений
+        - Класс ExercisesList:
+            - str type - упражнения какого типа содержит
+            - list exercises - список упражнений
 
-        - list EmphasisExercises
-        - list PrePriExercises
-        - list SuffixExercises
-        - list PrefixExercises
+            - __init__(str type) - загружает тренировки из соответствующего файла
+            - def pick() - выбирает случайную тренировку из списка тренировок
 
-        - list wait_list - список пользователей с необработанными запросами
-        - dict type - какой статус у пользователя. 0 - ударение, 1 - пре/при, 3 - смена имени, 2 - остальное
+    - Файл main.py содержит основную логику работы бота
+
+        - telebot bot - имеет ключ 6840057545:AAEJ2iaYYdauLkadStHlKOWn6ZihvKGJ-xA
+
+        - UserDatabase users
+
+        - ExercisesList EmphasisExercises
+        - ExercisesList PrePriExercises
+        - ExercisesList SuffixExercises
+        - ExercisesList PrefixExercises
 
         - @bot.message_handler(commands=["score"])
         def score(user) - выводит текущий счет пользователя
