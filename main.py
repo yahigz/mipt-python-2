@@ -8,7 +8,7 @@ sys.path.append("./src")
 
 from data import *
 
-bot = telebot.TeleBot('6840057545:AAEJ2iaYYdauLkadStHlKOWn6ZihvKGJ-xA')
+bot = telebot.TeleBot('')
 
 EmphasisExercises = ExercisesList("emphasis")
 PrePriExercises = ExercisesList("prepri")
